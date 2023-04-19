@@ -2,12 +2,19 @@ from warnings import filterwarnings
 filterwarnings("ignore")
 from scapy.all import *
 import subprocess, locale
+import platform
 
 def getOwnIp():
-    cmd = "ipconfig | findstr IPv4"
-    output = subprocess.check_output(cmd, shell=True)
-    encoding = locale.getpreferredencoding()
-    ownip = str(output.decode(encoding)).split(":")[1].strip()
+    if platform.system() == "Windows":
+        cmd = "ipconfig | findstr IPv4"
+        output = subprocess.check_output(cmd, shell=True)
+        encoding = locale.getpreferredencoding()
+        ownip = str(output.decode(encoding)).split(":")[1].strip()
+    if platform.system() == "Linux":
+        cmd = "ifconfig | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}'"
+        output = subprocess.check_output(cmd, shell=True)
+        ownip = output.decode().strip()
+        
     print(f"Your current IP is : {ownip}")
     print("Check if this ip is you're real local ip with ifconfig or ipconfig")
     answer = input(f"Is {ownip} ip correct ? Y or N :")
